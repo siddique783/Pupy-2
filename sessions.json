@@ -1,0 +1,5 @@
+[
+    {"name": "Target1", "ip": "192.168.1.100", "os": "Windows 10"},
+    {"name": "Target2", "ip": "192.168.1.101", "os": "Linux Ubuntu"},
+    {"name": "Target3", "ip": "192.168.1.102", "os": "Android"}
+]
